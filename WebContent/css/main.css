@@ -1,0 +1,21 @@
+@charset "ISO-8859-1";
+table {
+  font-family: "Trebuchet MS", Arial;
+  border-collapse: collapse;  
+  width: 50%;
+}
+
+tbody:nth-child(odd) tr:nth-child(odd) {
+  background-color: yellow;
+}
+
+tbody:nth-child(odd) tr:nth-child(even) {
+  background-color: #008080;
+}
+
+tbody:nth-child(even) tr:nth-child(odd) {
+  background-color: #8080c0;
+}
+tbody:nth-child(even) tr:nth-child(even) {
+  background-color: #ff80c0;
+}

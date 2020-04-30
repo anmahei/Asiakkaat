@@ -12,7 +12,10 @@
 	<table id="listaus">
 		<thead>	
 			<tr>
-				<th colspan="2" class="oikealle">Hakusana:</th>
+				<th colspan="5" class="oikealle"><span id="uusiAsiakas">Lis‰‰ uusi asiakas</span></th>
+			</tr>
+			<tr>
+				<th colspan="3" class="oikealle">Hakusana:</th>
 				<th><input type="text" id="hakusana"></th>
 				<th><input type="button" id="hae" value="Hae"></th>
 			</tr>		
@@ -20,7 +23,8 @@
 				<th>Etunimi</th>
 				<th>Sukunimi</th>
 				<th>Puhelin</th>
-				<th>Sposti</th>				
+				<th>Sposti</th>	
+				<th>&nbsp;</th>				
 			</tr>
 		</thead>
 		<tbody>
@@ -29,32 +33,49 @@
 <script>
 $(document).ready(function(){
 	
-	$(document.body).on("keydown", function(event){
-		  if(event.which==13){ 
-			  haeTiedot();
-		  }
+	$("#uusiAsiakas").click(function(){
+		document.location="lisaaasiakas.jsp";
 	});
 	
+	$(document.body).on("keydown", function(event){
+		  if(event.which==13){
+			  haeTiedot();
+		  }
+	});	
 	$("#hae").click(function(){	
 		haeTiedot();
 	});
-	
-	
+	$("#hakusana").focus();
+	haeTiedot();
 });
 function haeTiedot(){	
 	$("#listaus tbody").empty();
-	$.getJSON({url:"ListaaAsiakkaat", data:{hakusana: $("#hakusana").val()}, success:function(result){	
+	$.getJSON({url:"asiakkaat/"+$("#hakusana").val(), type:"GET", dataType:"json", success:function(result){	
 		$.each(result.asiakkaat, function(i, field){  
         	var htmlStr;
-        	htmlStr+="<tr>"; 
+        	htmlStr+="<tr id='rivi_"+field.asiakas_id+"'>";
         	htmlStr+="<td>"+field.etunimi+"</td>";
         	htmlStr+="<td>"+field.sukunimi+"</td>";
         	htmlStr+="<td>"+field.puhelin+"</td>";
-        	htmlStr+="<td>"+field.sposti+"</td>";       	
+        	htmlStr+="<td>"+field.sposti+"</td>";  
+        	htmlStr+="<td><span class='poista' onclick=poista("+field.asiakas_id+",'"+field.etunimi+"','"+field.sukunimi+"')>Poista</span></td>"; 
         	htmlStr+="</tr>";
         	$("#listaus tbody").append(htmlStr);
         });
     }});	
+}
+function poista(asiakas_id, etunimi, sukunimi){
+	if(confirm("Poista asiakas " + etunimi +" "+ sukunimi +"?")){	
+		$.ajax({url:"asiakkaat/"+asiakas_id, type:"DELETE", dataType:"json", success:function(result) {
+	        if(result.response==0){
+	        	$("#ilmo").html("Asiakkaan poisto ep‰onnistui.");
+	        }else if(result.response==1){
+	        	$("#rivi_"+asiakas_id).css("background-color", "red"); 
+	        	alert("Asiakkaan " + etunimi +" "+ sukunimi +" poisto onnistui.");
+				haeTiedot();        	
+			}
+	    }});
+	}
 }
 </script>
 </body>
